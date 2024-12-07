@@ -51,7 +51,7 @@ export default function CategoriesPage() {
               onChange={(e) => setNewCategoryColor(e.target.value)}
               className="w-20"
             />
-            <Button type="submit">
+            <Button type="submit" className="bg-blue-500 hover:bg-blue-600">
               <Plus className="mr-2 h-4 w-4" />
               Add Category
             </Button>
