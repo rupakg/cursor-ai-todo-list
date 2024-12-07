@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +9,13 @@ import Link from 'next/link';
 
 export default function CategoriesPage() {
   const { categories, addCategory, editCategory, deleteCategory } = useCategories();
+  const [isClient, setIsClient] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('#3B82F6');
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +25,10 @@ export default function CategoriesPage() {
       setNewCategoryColor('#3B82F6');
     }
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -51,7 +60,7 @@ export default function CategoriesPage() {
               onChange={(e) => setNewCategoryColor(e.target.value)}
               className="w-20"
             />
-            <Button type="submit" className="bg-blue-500 hover:bg-blue-600">
+            <Button type="submit">
               <Plus className="mr-2 h-4 w-4" />
               Add Category
             </Button>
