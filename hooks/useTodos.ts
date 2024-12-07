@@ -1,24 +1,47 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Todo, TodoStatus } from '@/lib/types';
 
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>(() => {
+    // Initialize todos from localStorage on mount
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('todos');
       if (saved) {
-        return JSON.parse(saved, (key, value) => {
-          if (key === 'startDate' || key === 'endDate' || key === 'createdAt') {
-            return value ? new Date(value) : null;
-          }
-          return value;
-        });
+        try {
+          const parsedTodos = JSON.parse(saved);
+          // Convert date strings back to Date objects
+          return parsedTodos.map((todo: any) => ({
+            ...todo,
+            createdAt: todo.createdAt ? new Date(todo.createdAt) : null,
+            startDate: todo.startDate ? new Date(todo.startDate) : null,
+            endDate: todo.endDate ? new Date(todo.endDate) : null,
+          }));
+        } catch (e) {
+          console.error('Failed to parse todos from localStorage:', e);
+          return [];
+        }
       }
     }
     return [];
   });
   const [filter, setFilter] = useState<TodoStatus>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const filteredTodos = useMemo(() => {
+    return todos.filter((todo) => {
+      const matchesStatus =
+        filter === 'all' ||
+        (filter === 'completed' && todo.completed) ||
+        (filter === 'active' && !todo.completed);
+      
+      const matchesCategory =
+        !selectedCategory || todo.categoryId === selectedCategory;
+
+      return matchesStatus && matchesCategory;
+    });
+  }, [todos, filter, selectedCategory]);
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -75,12 +98,6 @@ export function useTodos() {
     );
   };
 
-  const filteredTodos = todos.filter((todo) => {
-    if (filter === 'active') return !todo.completed;
-    if (filter === 'completed') return todo.completed;
-    return true;
-  });
-
   return {
     todos: filteredTodos,
     addTodo,
@@ -89,5 +106,7 @@ export function useTodos() {
     editTodo,
     filter,
     setFilter,
+    selectedCategory,
+    setSelectedCategory,
   };
 }
