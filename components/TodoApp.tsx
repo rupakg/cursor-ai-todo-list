@@ -7,15 +7,29 @@ import { TodoCount } from '@/components/TodoCount';
 import { useTodos } from '@/hooks/useTodos';
 
 export default function TodoApp() {
-  const { todos, addTodo, toggleTodo, deleteTodo, editTodo, filter, setFilter } =
-    useTodos();
+  const { 
+    todos, 
+    addTodo, 
+    toggleTodo, 
+    deleteTodo, 
+    editTodo, 
+    filter, 
+    setFilter,
+    selectedCategory,
+    setSelectedCategory 
+  } = useTodos();
 
   return (
     <div className="space-y-6 rounded-xl bg-white p-6 shadow-lg">
       <TodoInput onAdd={addTodo} />
 
       <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-        <TodoFilter current={filter} onChange={setFilter} />
+        <TodoFilter 
+          current={filter} 
+          onChange={setFilter}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+        />
         <TodoCount count={todos.length} />
       </div>
 
